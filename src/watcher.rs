@@ -41,8 +41,12 @@ impl Watcher {
                             return; // useless event
                         }
                         EventKind::Modify(ModifyKind::Data(DataChange::Any)) => {
-                            debug!("ignoring 'any' data change");
-                            return; // probably useless event with no real change
+                            if cfg!(target_os = "freebsd") {
+                                debug!("notify data change event: {we:?}");
+                            } else {
+                                debug!("ignoring 'any' data change");
+                                return; // probably useless event with no real change
+                            }
                         }
                         EventKind::Access(AccessKind::Close(AccessMode::Write)) => {
                             debug!("close write event: {we:?}");
